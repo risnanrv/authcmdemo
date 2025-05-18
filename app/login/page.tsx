@@ -38,7 +38,7 @@ export default function LoginPage() {
       } else {
         alert("Invalid credentials or login failed");
       }
-    } catch (error) {
+    } catch {
       alert("An error occurred during login");
     } finally {
       setLoading(false);
