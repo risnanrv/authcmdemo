@@ -8,27 +8,41 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const [loading, setLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: false, // so we can manually handle navigation
-    });
+    try {
+      const res = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
 
-    if (res?.ok) {
-      router.push("/dashboard"); // redirect after successful login
-    } else {
-      alert("Invalid credentials or login failed");
+      if (res?.ok) {
+        router.push("/dashboard");
+      } else {
+        alert("Invalid credentials or login failed");
+      }
+    } catch (error) {
+      alert("An error occurred during login");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -51,8 +65,9 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
+                suppressHydrationWarning
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#4328c7] focus:ring-[#4328c7] p-2 border"
               />
             </div>
@@ -67,8 +82,9 @@ export default function LoginPage() {
                 type="password"
                 autoComplete="current-password"
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={handleChange}
+                suppressHydrationWarning
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#4328c7] focus:ring-[#4328c7] p-2 border"
               />
             </div>
